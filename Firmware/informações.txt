@@ -1,0 +1,65 @@
+Parametros internos:
+- Leitura de temperatura errada
+- Sem material depois de x tempo para tudo (sem erro) (Imprimi END no LCD) (Botão Liga apaga o end e volta ao normal)
+- Sem mudança de temperatura de pois de x tempo (Erro) (imprimi erro no LCD)
+- Motor só se movimenta acima de temperatura x
+- Motor para abaixo de temperatura x
+
+Eletronica:
+- Bico:
+	- Sensor de Temperatura;
+- Zona de Dosagem:
+	- Sensor de Temperatura;
+	- Aquecimento.
+- Zona de Compressão:
+	- Sensor de Temperatura;
+	- Aquecimento.
+- Zona de Alimentação:
+	-Sensor de Temperatura.
+
+-x-
+
+- Motor:
+	- Nema 23;
+	- Driver Motor
+- Monitoramento:
+	- Tela LCD JHD 162A;
+	- Modulo I2C.
+- Emergencia:
+	-Botão cogumelo 2nf nr12 (4 terminais).
+
+-x-
+
+- LED:
+	- ON;
+	- Aquecendo 1;
+	- Aquecendo 2;
+	- Muito perigosso temperatura;
+	- Temperatura 1 ok;
+	- Temperatura 2 ok;
+	- Temperatura 3 ok;
+	- Temperatura 4 ok;
+	- Unidade 1 (para alteração);
+	- Unidade 2 (para alteração);
+	- Material Acabando;
+	- Material terminou.
+
+- Botão:
+	- Ativa/atualiza/reativa;
+	- Para todos os processos;
+	- Alvo 1 aumenta;
+	- Alvo 1 diminui;
+	- Alvo 2 aumenta;
+	- Alvo 2 diminui;
+	- Alvo 3 aumenta;
+	- Alvo 3 diminui;
+	- Alvo 4 aumenta;
+	- Alvo 4 diminui;
+	- Muda a unidade;
+
+-x-
+
+- Medidor de Material (dispenser):
+	- Ultra som.
+
+-x-
