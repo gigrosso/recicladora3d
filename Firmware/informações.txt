@@ -6,6 +6,15 @@ Parametros internos:
 - Motor para abaixo de temperatura x
 
 Eletronica:
+
+
+Por definir:
+	- Mosfet: IRL3034 ou STP75NF75
+	- Resfriamento por cooler ou peltier
+	- Dicipação de calor mosfet
+
+-x-
+
 - Bico:
 	- Sensor de Temperatura;
 - Zona de Dosagem:
@@ -21,7 +30,7 @@ Eletronica:
 
 - Motor:
 	- Nema 23;
-	- Driver Motor
+	- Driver Motor tb6600
 - Monitoramento:
 	- Tela LCD JHD 162A;
 	- Modulo I2C.
@@ -63,3 +72,18 @@ Eletronica:
 	- Ultra som.
 
 -x-
+
+- Aquecimento:
+	- ZD pelo menos 4 resistores ceramicos para aquecimento
+	- ZC pelo menos 2 resistores ceramicos para aquecimento
+
+- Acionamento do aquecimento via mosfet independente para cada zona
+
+- Resfriamento:
+	- coolers
+		-acionamento por transistor
+	- Placa peltier
+		-Acionamento por mosfet
+
+-x-
+
