@@ -65,7 +65,7 @@ Por definir:
 	- Alvo 4 aumenta;
 	- Alvo 4 diminui;
 	- Muda a unidade;
-
+	- Seleção do material para definir o passo do material (Nome do material mostrar no lcd mas informações de vazão permanecem interno)
 -x-
 
 - Medidor de Material (dispenser):
