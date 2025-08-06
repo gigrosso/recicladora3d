@@ -27,7 +27,6 @@ G92 E0 ; Reset Extruder
 G29 A L0
 G1 Z2.0 F3000 ; Move Z Axis up little to prevent scratching of Heat Bed
 G1 X5 Y20 Z0.3 F5000.0 ; Move over to prevent blob squish
-
 M300 S2637 P150
 M300 S2637 P150
 M300 S0 P75
