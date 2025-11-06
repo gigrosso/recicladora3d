@@ -1,0 +1,244 @@
+# Diagrama de Conexões - Sistema de Controle de Extrusora
+# Raspberry Pi Pico W
+
+==============================================================================
+                    RASPBERRY PI PICO W - PINOUT
+==============================================================================
+
+                         ┌─────────────┐
+                    GP0 ─┤1   USB   40├─ VBUS
+                    GP1 ─┤2         39├─ VSYS
+                    GND ─┤3         38├─ GND
+   MUX1_S0 ──────── GP2 ─┤4         37├─ 3V3_EN
+   MUX1_S1 ──────── GP3 ─┤5         36├─ 3V3(OUT)
+   MUX1_S2 ──────── GP4 ─┤6         35├─ ADC_VREF
+   MUX1_S3 ──────── GP5 ─┤7         34├─ GP28 ──── SENSOR2_ADC
+                    GND ─┤8         33├─ GND
+   MUX2_S0 ──────── GP6 ─┤9         32├─ GP27 ──── SENSOR1_ADC
+   MUX2_S1 ──────── GP7 ─┤10        31├─ GP26 ──── MUX1_SIG
+   MUX2_S2 ──────── GP8 ─┤11        30├─ RUN
+   MUX2_S3 ──────── GP9 ─┤12        29├─ GP22
+   MUX2_SIG ─────── GP10─┤13        28├─ GND
+   MOSFET1 ───────── GP11─┤14        27├─ GP21 ──── I2C_SCL
+   MOSFET2 ───────── GP12─┤15        26├─ GP20 ──── I2C_SDA
+   MOSFET3 ───────── GP13─┤16        25├─ GP19 ──── ULTRA_ECHO
+   MOSFET4 ───────── GP14─┤17        24├─ GP18 ──── ULTRA_TRIG
+                    GND ─┤18        23├─ GND
+   MOTOR_STEP ────── GP15─┤19        22├─ GP17 ──── MOTOR_ENABLE
+   MOTOR_DIR ─────── GP16─┤20        21├─ GP16
+                         └─────────────┘
+
+==============================================================================
+                    MULTIPLEXADOR 1 (CD74HC4067E) - BOTÕES
+==============================================================================
+
+    ┌─────────────────────────────────┐
+    │     CD74HC4067E - MUX1         │
+    │                                 │
+    │  S0 ── GP2                      │
+    │  S1 ── GP3                      │
+    │  S2 ── GP4                      │
+    │  S3 ── GP5                      │
+    │  SIG ─ GP26 (ADC0)              │
+    │  EN ── GND (sempre habilitado)  │
+    │  VCC ─ 3.3V                     │
+    │  GND ─ GND                      │
+    │                                 │
+    │  I0  ── Botão: Ativa/Atualiza   │
+    │  I1  ── Botão: Altera Unidade   │
+    │  I2  ── Botão: Aumenta Temp 1   │
+    │  I3  ── Botão: Diminui Temp 1   │
+    │  I4  ── Botão: Aumenta Temp 2   │
+    │  I5  ── Botão: Diminui Temp 2   │
+    │  I6  ── Botão: Aumenta Temp 3   │
+    │  I7  ── Botão: Diminui Temp 3   │
+    │  I8  ── Botão: Aumenta Temp 4   │
+    │  I9  ── Botão: Diminui Temp 4   │
+    │  I10 ── Botão: Para Extrusão    │
+    │  I11 ── Botão: Inicia Extrusão  │
+    │  I12 ── Botão: Seleciona Mat.   │
+    │  I13 ── Botão: Emergência       │
+    │  I14 ── Botão: Toggle Motor     │
+    │  I15 ── Botão: Aumenta RPM      │
+    └─────────────────────────────────┘
+
+    Cada botão conectado entre canal Ix e GND (pull-up interno)
+
+==============================================================================
+                    MULTIPLEXADOR 2 (CD74HC4067E) - LEDs
+==============================================================================
+
+    ┌─────────────────────────────────┐
+    │     CD74HC4067E - MUX2         │
+    │                                 │
+    │  S0 ── GP6                      │
+    │  S1 ── GP7                      │
+    │  S2 ── GP8                      │
+    │  S3 ── GP9                      │
+    │  SIG ─ GP10                     │
+    │  EN ── GND (sempre habilitado)  │
+    │  VCC ─ 3.3V                     │
+    │  GND ─ GND                      │
+    │                                 │
+    │  I0  ── LED: Sistema ON         │
+    │  I1  ── LED: Aquecendo S2       │
+    │  I2  ── LED: Aquecendo S3       │
+    │  I3  ── LED: Temp Alvo 1 OK     │
+    │  I4  ── LED: Temp Alvo 2 OK     │
+    │  I5  ── LED: Temp Alvo 3 OK     │
+    │  I6  ── LED: Temp 4 OK          │
+    │  I7  ── LED: Unidade °C         │
+    │  I8  ── LED: Unidade °F         │
+    │  I9  ── LED: Material Acabando  │
+    │  I10 ── LED: Material Acabou    │
+    │  I11 ── LED: Temperatura Alta   │
+    │  I12 ── LED: Reserva            │
+    │  I13 ── LED: Reserva            │
+    │  I14 ── LED: Reserva            │
+    │  I15 ── LED: Reserva            │
+    └─────────────────────────────────┘
+
+    Cada LED com resistor 330Ω em série para 3.3V
+
+==============================================================================
+                    SENSORES PT100 (Temperatura)
+==============================================================================
+
+    Sensor 1 (Bico Extrusora):
+    ┌────────────────┐
+    │    PT100       │
+    │   (Sensor 1)   │
+    │                │
+    │   ┌─────┐      │
+    │   │ PT  │      │
+    │   │ 100 │──────┼── GP27 (ADC1)
+    │   └─────┘      │
+    │      │         │
+    │     GND        │
+    └────────────────┘
+
+    Sensor 2 (Zona Dosagem): GP28 (ADC2)
+    Sensor 3 (Zona Compressão): GP29 (ADC3)
+    Sensor 4 (Zona Alimentação): Adicional se necessário
+
+    NOTA: Utilizar circuito condicionador com amplificador operacional
+          para converter resistência em tensão 0-3.3V
+
+==============================================================================
+                    MOSFETs (IRLB3034226P4Z)
+==============================================================================
+
+    MOSFET 1 (GP11) - Aquecimento Zona Dosagem:
+    ┌─────────────────────────────┐
+    │                             │
+    │  GP11 ──[1kΩ]── GATE        │
+    │                  │          │
+    │                MOSFET1      │
+    │                  │          │
+    │  12V+ ──────── DRAIN        │
+    │                  │          │
+    │            RESISTÊNCIA      │
+    │            AQUECIMENTO      │
+    │                  │          │
+    │  GND ────────── SOURCE      │
+    │                             │
+    └─────────────────────────────┘
+
+    MOSFET 2 (GP12) - Aquecimento Zona Compressão
+    MOSFET 3 (GP13) - Resfriamento (Ventoinha)
+    MOSFET 4 (GP14) - Alimentação Motor
+
+==============================================================================
+                    MOTOR NEMA 23 + DRIVER TB6600
+==============================================================================
+
+    Raspberry Pi Pico W         TB6600 Driver
+    ┌──────────────┐            ┌──────────────┐
+    │              │            │              │
+    │  GP15 ───────┼────────────┤ PUL+ (STEP)  │
+    │  GND ────────┼────────────┤ PUL- (STEP)  │
+    │              │            │              │
+    │  GP16 ───────┼────────────┤ DIR+ (DIR)   │
+    │  GND ────────┼────────────┤ DIR- (DIR)   │
+    │              │            │              │
+    │  GP17 ───────┼────────────┤ ENA+ (ENABLE)│
+    │  GND ────────┼────────────┤ ENA- (ENABLE)│
+    │              │            │              │
+    └──────────────┘            │ A+, A-       ├── Motor
+                                │ B+, B-       ├── Nema 23
+                                │              │
+                                │ VCC ── 12-36V│
+                                │ GND ── GND   │
+                                └──────────────┘
+
+==============================================================================
+                    LCD I2C (JHD 162A com módulo I2C)
+==============================================================================
+
+    Raspberry Pi Pico W         Módulo LCD I2C
+    ┌──────────────┐            ┌──────────────┐
+    │              │            │              │
+    │  GP20 (SDA)──┼────────────┤ SDA          │
+    │  GP21 (SCL)──┼────────────┤ SCL          │
+    │  3.3V ───────┼────────────┤ VCC          │
+    │  GND ────────┼────────────┤ GND          │
+    │              │            │              │
+    └──────────────┘            └──────────────┘
+
+    Endereço I2C: 0x27 (ou 0x3F dependendo do módulo)
+
+==============================================================================
+                    SENSOR ULTRASSÔNICO HC-SR04
+==============================================================================
+
+    Raspberry Pi Pico W         HC-SR04
+    ┌──────────────┐            ┌──────────────┐
+    │              │            │              │
+    │  GP18 ───────┼────────────┤ TRIG         │
+    │  GP19 ───────┼────────────┤ ECHO         │
+    │  5V ─────────┼────────────┤ VCC          │
+    │  GND ────────┼────────────┤ GND          │
+    │              │            │              │
+    └──────────────┘            └──────────────┘
+
+    NOTA: ECHO retorna 5V - usar divisor de tensão para 3.3V
+          Resistores: 2kΩ (alto) + 3kΩ (baixo)
+
+==============================================================================
+                    ALIMENTAÇÃO DO SISTEMA
+==============================================================================
+
+    ┌───────────────────────────────────────────┐
+    │  Fonte 12V (ou 24V) para:                 │
+    │  - Driver TB6600 (Motor)                  │
+    │  - Resistências de aquecimento (MOSFETs)  │
+    │  - Ventoinha de resfriamento              │
+    └───────────────────────────────────────────┘
+
+    ┌───────────────────────────────────────────┐
+    │  USB 5V para:                             │
+    │  - Raspberry Pi Pico W                    │
+    │  - Sensor Ultrassônico (converter)        │
+    └───────────────────────────────────────────┘
+
+    ┌───────────────────────────────────────────┐
+    │  3.3V do Pico para:                       │
+    │  - Multiplexadores                        │
+    │  - LCD I2C                                │
+    │  - LEDs (com resistores)                  │
+    └───────────────────────────────────────────┘
+
+==============================================================================
+                    NOTAS IMPORTANTES
+==============================================================================
+
+1. ISOLAMENTO: Use optoacopladores entre Pico e MOSFETs de alta potência
+2. SEGURANÇA: Adicione fusíveis nas linhas de alimentação
+3. DISSIPAÇÃO: MOSFETs de alta corrente precisam dissipadores
+4. CALIBRAÇÃO: Sensores PT100 requerem calibração precisa
+5. PROTEÇÃO: Adicione diodos flyback nos motores e cargas indutivas
+6. TERRA COMUM: Conecte todos os GNDs em um ponto comum
+7. CABO BLINDADO: Use cabos blindados para sensores de temperatura
+8. INTERFERÊNCIA: Separe cabos de potência dos cabos de sinal
+
+==============================================================================
