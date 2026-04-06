@@ -1,0 +1,11 @@
+(librepcb_library a988ea72-06dc-4024-aaa7-b0df2ba7af82
+ (name "My Library")
+ (description "")
+ (keywords "")
+ (author "Giovanni Grosso")
+ (version "0.1")
+ (created 2026-03-31T18:43:58Z)
+ (deprecated false)
+ (url "")
+ (manufacturer "")
+)

@@ -1,0 +1,10 @@
+(librepcb_component_category 807cda13-6ebd-4487-9456-d3b9773c2c8f
+ (name "Step Driver")
+ (description "")
+ (keywords "")
+ (author "Giovanni Grosso")
+ (version "0.1")
+ (created 2026-03-31T19:14:48Z)
+ (deprecated false)
+ (parent none)
+)

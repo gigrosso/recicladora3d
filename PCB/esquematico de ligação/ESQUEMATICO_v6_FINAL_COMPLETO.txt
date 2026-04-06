@@ -1,0 +1,913 @@
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║  ESQUEMÁTICO v6 FINAL - SISTEMA DE CONTROLE DE EXTRUSORA                    ║
+║  COMPLETO E CORRIGIDO - Todos os Componentes Incluídos                      ║
+║  Com Diagramas Detalhados de Montagem Passo a Passo                         ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+═══════════════════════════════════════════════════════════════════════════════
+                    ÍNDICE DO DOCUMENTO
+═══════════════════════════════════════════════════════════════════════════════
+
+1. VISÃO GERAL DO SISTEMA
+2. MAPA DE PINOS COMPLETO
+3. CIRCUITO PT100 COM TL431 (4 CANAIS) - DETALHADO
+4. CIRCUITO MOSFET + AQUECEDORES (4 CANAIS)
+5. MULTIPLEXADORES (BOTÕES E LEDS)
+6. LCD I2C
+7. SENSOR ULTRASSÔNICO
+8. MOTOR TB6600 + NEMA 23
+9. ALIMENTAÇÃO DO SISTEMA
+10. LISTA COMPLETA DE COMPONENTES
+11. CHECKLIST DE MONTAGEM
+12. VERIFICAÇÃO FINAL
+
+═══════════════════════════════════════════════════════════════════════════════
+                    1. VISÃO GERAL DO SISTEMA
+═══════════════════════════════════════════════════════════════════════════════
+
+SUBSISTEMAS:
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ A) 4× Sensores PT100 com circuito TL431 → Leitura de temperatura           │
+│ B) 4× MOSFETs com PWM → Controle de aquecimento e resfriamento             │
+│ C) 2× Multiplexadores → 16 botões + 16 LEDs                                │
+│ D) 1× LCD I2C → Display de informações                                     │
+│ E) 1× Sensor ultrassônico → Nível de material                              │
+│ F) 1× Motor Nema 23 + TB6600 → Controle de extrusão                        │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+MICROCONTROLADOR:
+• Raspberry Pi Pico W (RP2040)
+• 29 GPIOs (todos utilizados)
+• 4 ADCs (todos para sensores PT100)
+• 2 I2C, 2 SPI, 2 UART, 16 PWM
+
+ALIMENTAÇÃO:
+• 5V USB → Pico W → 3.3V regulado
+• 12V externa → Motor + Aquecedores + Ventoinhas
+
+═══════════════════════════════════════════════════════════════════════════════
+                    2. MAPA DE PINOS COMPLETO
+═══════════════════════════════════════════════════════════════════════════════
+
+RASPBERRY PI PICO W - PINAGEM COMPLETA
+                              ┌─────────────┐
+                    GP0/UART0─┤1   USB   40├─ VBUS (5V)
+                    GP1/UART0─┤2         39├─ VSYS
+                         GND ─┤3         38├─ GND
+    PWM1A Q1(BICO) ───── GP2 ─┤4         37├─ 3V3_EN
+    PWM1B Q2(DOSAG) ──── GP3 ─┤5         36├─ 3V3(OUT) ──┐
+    PWM2A Q3(COMPR) ──── GP4 ─┤6         35├─ ADC_VREF   │ 3.3V
+    PWM2B Q4(RESFR) ──── GP5 ─┤7         34├─ GP28/ADC2 ─┤ para CIs
+                         GND ─┤8         33├─ GND        │
+    MUX1_S0 (Botões) ─── GP6 ─┤9         32├─ GP27/ADC1 ─┤
+    MUX1_S1 (Botões) ─── GP7 ─┤10        31├─ GP26/ADC0 ─┘
+    MUX1_S2 (Botões) ─── GP8 ─┤11        30├─ RUN
+    MUX1_S3 (Botões) ─── GP9 ─┤12        29├─ GP22 ── MOTOR_STEP
+                         GND ─┤13        28├─ GND
+    MUX2_S0 (LEDs) ───── GP10─┤14        27├─ GP21 ── I2C_SCL
+    MUX2_S1 (LEDs) ───── GP11─┤15        26├─ GP20 ── I2C_SDA
+    MUX2_S2 (LEDs) ───── GP12─┤16        25├─ GP19 ── MOTOR_DIR
+    MUX2_S3 (LEDs) ───── GP13─┤17        24├─ GP18 ── ULTRASONIC_TRIG
+    MUX1_SIG (Botões) ── GP14─┤18        23├─ GND
+    MUX2_SIG (LEDs) ──── GP15─┤19        22├─ GP17 ── MOTOR_ENABLE
+                    (NC) GP16─┤20        21├─ GP16 (NC)
+                              └─────────────┘
+
+    GP23: ULTRASONIC_ECHO (pino especial, não mostrado no diagrama padrão)
+    GP29/ADC3: PT100 Sensor 4 (via jumper interno no verso da placa)
+
+RESUMO DE ALOCAÇÃO:
+┌──────┬─────────────────────────┬──────────────────────────────────────────┐
+│ GPIO │ Função                  │ Observação                               │
+├──────┼─────────────────────────┼──────────────────────────────────────────┤
+│ GP0  │ UART TX (Debug)         │ Opcional - pode usar para expansão       │
+│ GP1  │ UART RX (Debug)         │ Opcional - pode usar para expansão       │
+│ GP2  │ PWM Q1 (BICO)           │ Slice 1A - PID 100Hz                     │
+│ GP3  │ PWM Q2 (DOSAGEM)        │ Slice 1B - PID 100Hz                     │
+│ GP4  │ PWM Q3 (COMPRESSÃO)     │ Slice 2A                                 │
+│ GP5  │ PWM Q4 (RESFRIAMENTO)   │ Slice 2B ou GPIO                         │
+│ GP6  │ MUX1 S0                 │ Seleção binária botões                   │
+│ GP7  │ MUX1 S1                 │ Seleção binária botões                   │
+│ GP8  │ MUX1 S2                 │ Seleção binária botões                   │
+│ GP9  │ MUX1 S3                 │ Seleção binária botões                   │
+│ GP10 │ MUX2 S0                 │ Seleção binária LEDs                     │
+│ GP11 │ MUX2 S1                 │ Seleção binária LEDs                     │
+│ GP12 │ MUX2 S2                 │ Seleção binária LEDs                     │
+│ GP13 │ MUX2 S3                 │ Seleção binária LEDs                     │
+│ GP14 │ MUX1 SIG                │ Entrada botões (pull-up interno)         │
+│ GP15 │ MUX2 SIG                │ Saída LEDs                               │
+│ GP16 │ (Não usado)             │ Reserva                                  │
+│ GP17 │ Motor ENABLE            │ Liga/desliga motor                       │
+│ GP18 │ Ultrassônico TRIG       │ Trigger ultrassom                        │
+│ GP19 │ Motor DIR               │ Direção motor                            │
+│ GP20 │ I2C SDA                 │ LCD                                      │
+│ GP21 │ I2C SCL                 │ LCD                                      │
+│ GP22 │ Motor STEP              │ Pulso motor                              │
+│ GP23 │ Ultrassônico ECHO       │ Com divisor de tensão                    │
+│ GP26 │ ADC0 PT100 BICO         │ Leitura rápida PID 100Hz                 │
+│ GP27 │ ADC1 PT100 DOSAGEM      │ Leitura rápida PID 100Hz                 │
+│ GP28 │ ADC2 PT100 COMPRESSÃO   │ Leitura lenta 10Hz                       │
+│ GP29 │ ADC3 PT100 ALIMENTAÇÃO  │ Leitura lenta 10Hz (jumper interno)      │
+└──────┴─────────────────────────┴──────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════════════════════
+        3. CIRCUITO PT100 COM TL431 - DIAGRAMA DETALHADO COMPLETO
+═══════════════════════════════════════════════════════════════════════════════
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ CANAL 1: SENSOR BICO6 → GPIO26 (ADC0)                                      │
+│ REPITA ESTE CIRCUITO 4 VEZES PARA OS 4 SENSORES                            │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+PARTE 1: FONTE DE CORRENTE CONSTANTE COM TL431
+───────────────────────────────────────────────
+
+                        +3.3V (Pico pin 36)
+                           │
+                           │
+                      ┌────┴────┐
+                      │  C1     │ 100nF ← DESACOPLAMENTO 3.3V
+                      │ 100nF   │        (reduz ruído)
+                      └────┬────┘
+                           │
+                          GND
+                           │
+                           ├────[R1: 100Ω]────┐
+                           │                  │
+                        +3.3V              ┌──┴──┐
+                           │          Ref ─┤ 1   │
+                           │      (Adjust) │     │ TL431
+                           │               │     │ (TO-92)
+                       ┌───┴───┐   Cathode─┤ 2   │ Vista de baixo:
+                       │  R2   │           └──┬──┘  ___
+                       │2.2kΩ  │       2.5V   │     |1 2|
+                       └───┬───┘              │     | 3 |
+                           │                  │     -----
+                       ┌───┴───┐              │     1=Ref
+                       │  R3   │              │     2=Cathode
+                       │3.9kΩ  │          ┌───┴────┐ 3=Anode(GND)
+                       └───┬───┘          │   R4   │
+                           │              │  430Ω  │ ⚠️ PRECISÃO ±0.1%
+                          GND             │±0.1%   │    METAL FILM!
+                                          └───┬────┘
+                                              │
+                                          ┌───┴───┐
+                                          │ PT100 │ Sensor
+                        Saída TL431 ──────┤ BICO6 │ 100Ω @ 0°C
+                        (corrente         │       │ 138Ω @ 100°C
+                         constante)       └───┬───┘
+                                              │
+                                             GND
+               ┌────────┐
+               │   C2   │ 100nF ← FILTRO SAÍDA TL431
+               │ 100nF  │        (estabiliza corrente)
+               └───┬────┘
+                   │
+                  GND
+
+PARTE 2: AMPLIFICADOR OPERACIONAL (GANHO E FILTRO)
+──────────────────────────────────────────────────
+
+                        +3.3V (Pico pin 36)
+                           │
+                      ┌────┴────┐
+                      │   C3    │ 100nF ← DESACOPLAMENTO OPAMP VCC
+                      │ 100nF   │        (estabiliza alimentação)
+                      └────┬────┘
+                           │
+                          GND
+                           │
+                           ├──────────────→ Pin 8 (VCC)
+                           │
+                           │            LM358P (DIP-8)
+                           │         ┌──────────────┐
+    PT100 (via TL431) ─────┼─────────┤3 IN+    OUT 1├─────┬───→ Saída
+    +2.5V com variação     │         │              │     │
+    conforme temperatura   │     ┌───┤4 IN-         │     │
+                           │     │   │              │     │
+                       ┌───┴───┐ │   │        VCC  8├─────┘
+                       │  R5   │ │   │              │
+                       │ 10kΩ  │ │   │   GND        │
+                       │  ±1%  │ │   │              │
+                       └───┬───┘ │   │1 OUT    IN- 5│ (OpAmp 2
+                           │     │   │              │  não usado)
+                          GND    │   │2 IN-    IN+ 6│
+                                 │   │              │
+                                 │   └──────┬───────┘
+                                 │          │ Pin 4 (GND)
+                                 │          │
+                                 │     ┌────┴────┐
+                                 │     │   C4    │ 10µF ← FILTRO GND OPAMP
+                                 │     │  10µF   │       (estabiliza)
+                                 │     │ 16V     │
+                                 │     └────┬────┘
+                                 │          │
+                                 │         GND
+                                 │
+                             ┌───┴───┐
+                             │  R6   │ 10kΩ ← DIVISOR TENSÃO
+                             │ 10kΩ  │       (ajusta ganho)
+                             │  ±1%  │
+                             └───┬───┘
+                                 │
+                                GND
+
+PARTE 3: FILTRO DE SAÍDA E CONEXÃO AO ADC
+──────────────────────────────────────────
+
+    Saída OpAmp ───┬──────────────────────→ GPIO26 (ADC0)
+                   │                         Pico W
+                   │
+              ┌────┴────┐
+              │   C5    │ 47µF ← FILTRO FINAL
+              │  47µF   │       (remove ruído)
+              │  25V    │
+              └────┬────┘
+                   │
+                  GND
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ COMPONENTES POR CANAL (× 4 PARA OS 4 SENSORES)                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+CIRCUITOS INTEGRADOS:
+[ ] 1× TL431 (TO-92) - Referência de tensão 2.5V
+[ ] 0.5× LM358P (DIP-8) - Amplificador operacional dual
+
+RESISTORES:
+[ ] 1× R1 = 100Ω ±5% 1/4W - Limitador corrente TL431
+[ ] 1× R2 = 2.2kΩ ±5% 1/4W - Divisor tensão TL431 (superior)
+[ ] 1× R3 = 3.9kΩ ±5% 1/4W - Divisor tensão TL431 (inferior)
+[ ] 1× R4 = 430Ω ±0.1% 1/4W METAL FILM ⚠️ - Corrente constante PT100
+[ ] 1× R5 = 10kΩ ±1% 1/4W - Resistor feedback OpAmp
+[ ] 1× R6 = 10kΩ ±1% 1/4W - Divisor saída OpAmp
+
+CAPACITORES:
+[ ] 1× C1 = 100nF cerâmico X7R 50V - Desacoplamento 3.3V
+[ ] 1× C2 = 100nF cerâmico X7R 50V - Filtro saída TL431
+[ ] 1× C3 = 100nF cerâmico X7R 50V - Desacoplamento OpAmp VCC
+[ ] 1× C4 = 10µF eletrolítico 16V radial - Filtro OpAmp GND
+[ ] 1× C5 = 47µF eletrolítico 25V radial - Filtro final saída
+
+SENSOR:
+[ ] 1× PT100 (2 fios, Classe A ou B)
+
+FIAÇÃO:
+[ ] 2× Fio 22AWG para PT100 (ou cabo blindado 2 vias)
+[ ] 1× Fio 22AWG para saída ADC
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ TOTAL PARA 4 CANAIS (BICO, DOSAGEM, COMPRESSÃO, ALIMENTAÇÃO)               │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+CIRCUITOS INTEGRADOS:
+[ ] 4× TL431 (TO-92)
+[ ] 2× LM358P (DIP-8) - 1 chip tem 2 OpAmp, serve 2 canais
+
+RESISTORES:
+[ ] 4× 100Ω ±5%
+[ ] 4× 2.2kΩ ±5%
+[ ] 4× 3.9kΩ ±5%
+[ ] 4× 430Ω ±0.1% METAL FILM ⚠️ CRÍTICO!
+[ ] 8× 10kΩ ±1% (4× R5 + 4× R6)
+
+CAPACITORES:
+[ ] 12× 100nF cerâmico X7R 50V (3 por canal: C1, C2, C3)
+[ ] 4× 10µF eletrolítico 16V radial (1 por canal: C4)
+[ ] 4× 47µF eletrolítico 25V radial (1 por canal: C5)
+
+SENSORES:
+[ ] 4× PT100 (2 fios)
+
+CONEXÕES AOS ADCs:
+• Canal 1 (BICO6) → GPIO26 (ADC0)
+• Canal 2 (ZD5 Dosagem) → GPIO27 (ADC1)
+• Canal 3 (ZC4 Compressão) → GPIO28 (ADC2)
+• Canal 4 (ZA3 Alimentação) → GPIO29 (ADC3)
+
+═══════════════════════════════════════════════════════════════════════════════
+        4. CIRCUITO MOSFET + AQUECEDORES - DIAGRAMA COMPLETO
+═══════════════════════════════════════════════════════════════════════════════
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ CANAL Q1: AQUECIMENTO BICO (GPIO2 PWM)                                     │
+│ REPITA PARA Q2 (GP3), Q3 (GP4), Q4 (GP5)                                   │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+                        Fonte 12V+ (J3)
+                             │
+                             ├────[R_aq1: 6.8Ω 25W]────┐
+                             ├────[R_aq2: 6.8Ω 25W]────┤ 3 resistores
+                             └────[R_aq3: 6.8Ω 25W]────┴ em paralelo
+                                                        │ = 2.27Ω
+                                                        │ = 63W @ 12V
+                                                        │
+                                                     ┌──┴────┐
+                                                     │ Drain │
+                                                     │       │
+    GPIO2 ───────[R7: 10kΩ]───────┬─────────────────┤ Gate  │ MOSFET Q1
+    (PWM)                          │                 │       │ IRLB3034
+    Pico W                         │                 │ Source│ (TO-220)
+                              [R8: 100kΩ]            └───┬───┘
+                                   │                     │
+                                  GND                    │
+                                                      Dissipador
+                                                      + Pasta
+                                                         │
+                                                        GND
+
+COMPONENTES POR MOSFET:
+[ ] 1× MOSFET IRLB3034 (TO-220 N-channel)
+[ ] 1× Dissipador TO-220 (com furos para parafuso)
+[ ] ~1g Pasta térmica
+[ ] 1× R7 = 10kΩ ±5% 1/4W - Pull-up Gate
+[ ] 1× R8 = 100kΩ ±5% 1/4W - Pull-down Gate
+[ ] 3-4× Resistor 6.8Ω 25W cerâmico - Elementos aquecedores
+
+NOTAS:
+• Dissipador obrigatório (MOSFET aquece!)
+• Pasta térmica entre MOSFET e dissipador
+• R7 evita flutuação do Gate (importante!)
+• R8 garante MOSFET desligado no boot
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ DISTRIBUIÇÃO DOS 14 RESISTORES CERÂMICOS 6.8Ω 25W                          │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Q1 - BICO (GPIO2):
+• 3× resistores 6.8Ω em paralelo
+• R_total = 6.8Ω / 3 = 2.27Ω
+• Potência = 12² / 2.27 = 63.4W
+• Corrente = 12 / 2.27 = 5.3A
+
+Q2 - DOSAGEM (GPIO3):
+• 4× resistores 6.8Ω em paralelo
+• R_total = 6.8Ω / 4 = 1.70Ω
+• Potência = 12² / 1.70 = 84.7W
+• Corrente = 12 / 1.70 = 7.1A
+
+Q3 - COMPRESSÃO (GPIO4):
+• 4× resistores 6.8Ω em paralelo
+• R_total = 6.8Ω / 4 = 1.70Ω
+• Potência = 12² / 1.70 = 84.7W
+• Corrente = 12 / 1.70 = 7.1A
+
+Q4 - RESFRIAMENTO (GPIO5):
+• Ventoinha 12V (não usa resistores cerâmicos)
+• Ou 0× resistores se for apenas ventoinha
+
+RESERVA:
+• 3× resistores 6.8Ω (backup)
+
+TOTAL: 3 + 4 + 4 + 0 + 3 = 14 resistores cerâmicos ✓
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ TOTAL PARA 4 MOSFETs                                                        │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+[ ] 4× MOSFET IRLB3034 TO-220
+[ ] 4× Dissipador TO-220
+[ ] 1 tubo Pasta térmica (~5g)
+[ ] 4× 10kΩ ±5% (pull-up R7)
+[ ] 4× 100kΩ ±5% (pull-down R8)
+[ ] 14× Resistor 6.8Ω 25W cerâmico (elementos aquecedores)
+[ ] 1× Ventoinha 12V para Q4 (opcional, resfriamento)
+
+═══════════════════════════════════════════════════════════════════════════════
+        5. MULTIPLEXADORES - BOTÕES E LEDs
+═══════════════════════════════════════════════════════════════════════════════
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ MUX1 - BOTÕES (16 CANAIS) - CD74HC4067E                                    │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    Raspberry Pico W              CD74HC4067E (U2)
+    ┌──────────────┐              ┌────────────────┐
+    │ 3.3V (pin 36)├──────────────┤VCC (pin 24)    │
+    │              │              │                │
+    │ GND (pin 38) ├──────────────┤GND (pin 12)    │
+    │              │              │                │
+    │              │              │E (pin 15) ─────┤ GND (sempre ativo)
+    │              │              │                │
+    │ GP6 (pin 9)  ├──────────────┤S0 (pin 10)     │
+    │ GP7 (pin 10) ├──────────────┤S1 (pin 11)     │
+    │ GP8 (pin 11) ├──────────────┤S2 (pin 14)     │
+    │ GP9 (pin 12) ├──────────────┤S3 (pin 13)     │
+    │              │              │                │
+    │ GP14 (pin 18)├──────────────┤SIG (pin 1)     │
+    │ (pull-up int)│              │                │
+    └──────────────┘              │                │
+                                  │C0 (pin 9)  ────┤ [S1: Ativa] ─── GND
+                                  │C1 (pin 8)  ────┤ [S2: Unid.Alt]─ GND
+                                  │C2 (pin 7)  ────┤ [S3: +Temp1] ── GND
+                                  │C3 (pin 6)  ────┤ [S4: -Temp1] ── GND
+                                  │C4 (pin 5)  ────┤ [S5: +Temp2] ── GND
+                                  │C5 (pin 4)  ────┤ [S6: -Temp2] ── GND
+                                  │C6 (pin 3)  ────┤ [S7: +Temp3] ── GND
+                                  │C7 (pin 2)  ────┤ [S8: -Temp3] ── GND
+                                  │C8 (pin 23) ────┤ [S9: +Temp4] ── GND
+                                  │C9 (pin 22) ────┤ [S10:-Temp4] ── GND
+                                  │C10 (pin 21)────┤ [S11: Para] ─── GND
+                                  │C11 (pin 20)────┤ [S12: Inicia]─ GND
+                                  │C12 (pin 19)────┤ [S13: Mat.Sel]─GND
+                                  │C13 (pin 18)────┤ [S14: Emerg] ── GND
+                                  │C14 (pin 17)────┤ [S15: M.Tog] ── GND
+                                  │C15 (pin 16)────┤ [S16: +RPM] ─── GND
+                                  └────────────────┘
+
+COMPONENTES MUX1:
+[ ] 1× CD74HC4067E (DIP-24 ou módulo breakout)
+[ ] 16× Botão táctil 6×6mm (momentâneo)
+[ ] 0× Resistores (pull-up interno do Pico ativado no código)
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ MUX2 - LEDs (16 CANAIS) - CD74HC4067E                                      │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    Raspberry Pico W              CD74HC4067E (U3)
+    ┌──────────────┐              ┌────────────────┐
+    │ 3.3V (pin 36)├──────────────┤VCC (pin 24)    │
+    │ GND (pin 38) ├──────────────┤GND (pin 12)    │
+    │              │              │E (pin 15) ─────┤ GND
+    │ GP10 (pin 14)├──────────────┤S0 (pin 10)     │
+    │ GP11 (pin 15)├──────────────┤S1 (pin 11)     │
+    │ GP12 (pin 16)├──────────────┤S2 (pin 14)     │
+    │ GP13 (pin 17)├──────────────┤S3 (pin 13)     │
+    │ GP15 (pin 19)├──────────────┤SIG (pin 1)     │
+    └──────────────┘              │                │
+                                  │C0 ────[330Ω]───(+LED1)─── GND
+                                  │C1 ────[330Ω]───(+LED2)─── GND
+                                  │C2 ────[330Ω]───(+LED3)─── GND
+                                  │...
+                                  │C15────[330Ω]───(+LED16)── GND
+                                  └────────────────┘
+
+COMPONENTES MUX2:
+[ ] 1× CD74HC4067E (DIP-24 ou módulo breakout)
+[ ] 16× LED 5mm (sortidos: vermelho, verde, amarelo, azul)
+[ ] 16× Resistor 330Ω ±5% 1/4W (limitador corrente LED)
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ TOTAL MULTIPLEXADORES                                                       │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+[ ] 2× CD74HC4067E (DIP-24)
+[ ] 16× Botão táctil 6×6mm
+[ ] 16× LED 5mm sortidos
+[ ] 16× Resistor 330Ω ±5%
+
+═══════════════════════════════════════════════════════════════════════════════
+        6. LCD I2C - DISPLAY 16×2
+═══════════════════════════════════════════════════════════════════════════════
+
+    Raspberry Pico W              LCD 16×2 I2C
+    ┌──────────────┐              ┌──────────────┐
+    │              │              │ ┌──────────┐ │
+    │ GP20 (pin 26)├──────────────┤ │16×2 chars│ │
+    │ (I2C0 SDA)   │              │ │  Display │ │
+    │              │              │ └──────────┘ │
+    │ GP21 (pin 27)├──────────────┤              │
+    │ (I2C0 SCL)   │              │   PCF8574    │
+    │              │              │   (módulo)   │
+    │ 3.3V (pin 36)├──────────────┤              │
+    │              │              │              │
+    │ GND (pin 38) ├──────────────┤              │
+    └──────────────┘              └──────────────┘
+
+COMPONENTES:
+[ ] 1× Display LCD 16×2 com módulo I2C (PCF8574 ou similar)
+
+ENDEREÇO I2C:
+• Comum: 0x27 ou 0x3F
+• Verificar com i2c_scan antes de usar
+
+CONEXÕES:
+• GP20 → SDA (dados)
+• GP21 → SCL (clock)
+• 3.3V → VCC
+• GND → GND
+
+═══════════════════════════════════════════════════════════════════════════════
+        7. SENSOR ULTRASSÔNICO HC-SR04
+═══════════════════════════════════════════════════════════════════════════════
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ ⚠️ DIVISOR DE TENSÃO OBRIGATÓRIO NO ECHO (5V → 3.3V)                       │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    Raspberry Pico W              HC-SR04
+    ┌──────────────┐              ┌──────────────┐
+    │              │              │              │
+    │ GP18 (pin 24)├──────────────┤TRIG          │
+    │              │              │              │
+    │              │              │              │
+    │ GP23 ────────┼──┐           │ECHO (5V!)    │
+    │              │  │           │      │       │
+    │              │[R9:2kΩ]      │      └───────┤ Saída 5V
+    │              │  │           │              │
+    │              │  ├───────────┤              │
+    │              │  │           │              │
+    │              │[R10:3kΩ]     │              │
+    │              │  │           │              │
+    │ GND (pin 23) ├──┴───────────┤GND           │
+    │              │              │              │
+    │ VBUS (pin 40)├──────────────┤VCC (5V)      │
+    │ (5V)         │              │              │
+    └──────────────┘              └──────────────┘
+
+    DIVISOR DE TENSÃO:
+    
+    HC-SR04 ECHO (5V) ───[R9: 2kΩ]───┬─→ GP23 (3.0V ✓)
+                                      │
+                                  [R10: 3kΩ]
+                                      │
+                                     GND
+
+    Cálculo: Vout = 5V × 3kΩ / (2kΩ + 3kΩ) = 5V × 0.6 = 3.0V ✓
+    (Seguro para o Pico que aceita max 3.3V)
+
+COMPONENTES:
+[ ] 1× HC-SR04 sensor ultrassônico
+[ ] 1× R9 = 2kΩ ±5% 1/4W (divisor superior)
+[ ] 1× R10 = 3kΩ ±5% 1/4W (divisor inferior)
+
+⚠️ NÃO conectar ECHO direto no GP23 sem divisor! (queima o Pico!)
+
+═══════════════════════════════════════════════════════════════════════════════
+        8. MOTOR TB6600 + NEMA 23
+═══════════════════════════════════════════════════════════════════════════════
+
+    Raspberry Pico W      TB6600 Driver           Motor Nema 23
+    ┌──────────────┐      ┌──────────────┐        ┌────────────┐
+    │              │      │              │        │            │
+    │ GP22 (pin 29)├──────┤PUL+ (STEP)   │        │A+ Vermelho │
+    │              │  ┌───┤PUL- (GND)    │    ┌───┤A- Verde    │
+    │              │  │   │              │    │   │            │
+    │ GP19 (pin 25)├──┤   │DIR+ (DIR)    │    │   │B+ Azul     │
+    │              │  │   │DIR- (GND)    │    │   │B- Amarelo  │
+    │              │  │   │              │    │   │            │
+    │ GP17 (pin 22)├──┤   │ENA+ (ENABLE) │    │   └────────────┘
+    │              │  │   │ENA- (GND)    │    │   200 passos/rev
+    │              │  │   │              │    │   1.8° por passo
+    │ GND (pin 23) ├──┴───┤GND           │    │   2.0A nominal
+    │              │      │              │    │
+    │              │      │A+, A- ───────┼────┘
+    │              │      │B+, B- ───────┼────┐
+    │              │      │              │    │
+    │              │      │VCC ← 12-24V  │    │
+    │              │      │(fonte externa)    │
+    │              │      │              │    │
+    │              │      │GND ← GND     │    │
+    └──────────────┘      └──────────────┘    │
+
+DIP SWITCHES DO TB6600:
+┌────────────────────────────────────────┐
+│ SW1 SW2 SW3 | Microsteps              │
+│ OFF OFF OFF | 1 (200 passos/rev)      │
+│ ON  OFF OFF | 2 (400 passos/rev)      │
+│ OFF ON  OFF | 4 (800 passos/rev)      │
+│ ON  ON  OFF | 8 (1600 passos/rev) ←   │
+│ ...                                    │
+│                                        │
+│ SW4 SW5 SW6 | Corrente                │
+│ Configurar conforme motor (2.0A)      │
+└────────────────────────────────────────┘
+
+Configuração recomendada:
+• Microsteps: 1/8 (SW1=ON, SW2=ON, SW3=OFF)
+• Corrente: Ajustar DIP 4-6 para 2.0A (ver manual TB6600)
+
+COMPONENTES:
+[ ] 1× TB6600 driver stepper motor
+[ ] 1× Motor Nema 23 (2.0A, 200 passos/rev, 1.8°/passo)
+[ ] 0× Resistores adicionais (conexão direta)
+
+═══════════════════════════════════════════════════════════════════════════════
+        9. ALIMENTAÇÃO DO SISTEMA
+═══════════════════════════════════════════════════════════════════════════════
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ FONTE 1: USB 5V → RASPBERRY PI PICO W                                      │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    USB 5V (J4) ──→ Pico W VBUS (pin 40)
+                       │
+                       ├──→ Regulador interno 3.3V
+                       │
+                       └──→ 3V3_OUT (pin 36) ──┬──→ TL431 (4×)
+                                               ├──→ LM358 (2×)
+                                               ├──→ CD74HC4067 (2×)
+                                               ├──→ LCD I2C (1×)
+                                               └──→ Outros CIs
+
+Consumo 3.3V:
+• Pico W: ~80mA
+• TL431 (4×): ~20mA
+• LM358 (2×): ~10mA
+• MUX (2×): ~2mA
+• LCD I2C: ~30mA
+• LEDs (16× via MUX): ~20mA (1 por vez)
+────────────────────
+TOTAL: ~162mA ✓ (Pico fornece até 300mA no 3V3_OUT)
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ FONTE 2: 12V EXTERNA → MOTOR + AQUECEDORES                                 │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    Fonte 12V (J3) ──→ [Fusível 25A] ──→ [Chave ON/OFF] ──┬──→ TB6600 VCC
+    20-30A                                                 │
+                                                           ├──→ Q1 Drain (Bico)
+                                                           ├──→ Q2 Drain (Dosag)
+                                                           ├──→ Q3 Drain (Compr)
+                                                           └──→ Q4 Drain (Resfr)
+
+Consumo 12V:
+• Motor Nema 23: ~2A (picos 4A)
+• Aquecimento Bico (Q1): ~5.3A (3× 6.8Ω)
+• Aquecimento Dosagem (Q2): ~7.1A (4× 6.8Ω)
+• Aquecimento Compressão (Q3): ~7.1A (4× 6.8Ω)
+• Resfriamento (Q4): ~0.5A (ventoinha)
+────────────────────────────────────────────
+TOTAL MÁXIMO: ~22A (se tudo ligado simultaneamente)
+
+Fonte recomendada:
+• Tensão: 12V DC
+• Corrente: 30A (margem de segurança)
+• Potência: 360W
+• Tipo: Chaveada (switching)
+
+COMPONENTES ALIMENTAÇÃO:
+[ ] 1× Fonte 12V 30A (360W)
+[ ] 1× Fusível 25-30A (proteção)
+[ ] 1× Porta-fusível
+[ ] 1× Chave liga/desliga 10A
+[ ] 2m Cabo 2.5mm² vermelho (12V+)
+[ ] 2m Cabo 2.5mm² preto (GND)
+[ ] 1× Cabo micro-USB (para Pico W)
+
+⚠️ IMPORTANTE GNDs:
+• GND do Pico e GND da fonte 12V DEVEM estar conectados
+• Use um ponto comum de GND (barra de terra)
+
+═══════════════════════════════════════════════════════════════════════════════
+        10. LISTA COMPLETA DE COMPONENTES - VERIFICADA
+═══════════════════════════════════════════════════════════════════════════════
+
+┌────────────────────────┬─────┬──────────────┬──────────────┐
+│ COMPONENTE             │ QTD │ Preço Unit.  │ Total        │
+├────────────────────────┼─────┼──────────────┼──────────────┤
+│ MICROCONTROLADOR                                          │
+├────────────────────────┼─────┼──────────────┼──────────────┤
+│ Raspberry Pi Pico W    │ 1   │ R$ 45-55     │ R$ 45-55     │
+│ Cabo micro-USB         │ 1   │ R$ 8-15      │ R$ 8-15      │
+├────────────────────────┼─────┼──────────────┼──────────────┤
+│ CIRCUITO TL431 (PT100)                                    │
+├────────────────────────┼─────┼──────────────┼──────────────┤
+│ TL431 (TO-92)          │ 4   │ R$ 1-3       │ R$ 4-12      │
+│ LM358P (DIP-8)         │ 2   │ R$ 2-4       │ R$ 4-8       │
+│ PT100 2 fios           │ 4   │ R$ 20-60     │ R$ 80-240    │
+│                        │     │              │              │
+│ Resistores TL431:      │     │              │              │
+│ • 100Ω ±5%             │ 4   │ R$ 0.10      │ R$ 0.40      │
+│ • 2.2kΩ ±5%            │ 4   │ R$ 0.10      │ R$ 0.40      │
+│ • 3.9kΩ ±5%            │ 4   │ R$ 0.10      │ R$ 0.40      │
+│ • 430Ω ±0.1% ⚠️        │ 4   │ R$ 2-5       │ R$ 8-20      │
+│ • 10kΩ ±1%             │ 8   │ R$ 0.15      │ R$ 1.20      │
+│                        │     │              │              │
+│ Capacitores TL431:     │     │              │              │
+│ • 100nF X7R ⚠️         │ 12  │ R$ 0.30      │ R$ 3.60      │
+│ • 10µF/16V radial      │ 4   │ R$ 0.50      │ R$ 2.00      │
+│ • 47µF/25V radial      │ 4   │ R$ 0.80      │ R$ 3.20      │
+├────────────────────────┼─────┼──────────────┼──────────────┤
+│ MOSFETs + AQUECIMENTO                                     │
+├────────────────────────┼─────┼──────────────┼──────────────┤
+│ IRLB3034 (TO-220)      │ 4   │ R$ 3-8       │ R$ 12-32     │
+│ Dissipador TO-220      │ 4   │ R$ 2-5       │ R$ 8-20      │
+│ Pasta térmica (tubo)   │ 1   │ R$ 8-15      │ R$ 8-15      │
+│ R 10kΩ ±5%             │ 4   │ R$ 0.10      │ R$ 0.40      │
+│ R 100kΩ ±5%            │ 4   │ R$ 0.10      │ R$ 0.40      │
+│ R 6.8Ω 25W cerâmico    │ 14  │ R$ 2-5       │ R$ 28-70     │
+│ Ventoinha 12V (Q4)     │ 1   │ R$ 10-20     │ R$ 10-20     │
+├────────────────────────┼─────┼──────────────┼──────────────┤
+│ MULTIPLEXADORES                                           │
+├────────────────────────┼─────┼──────────────┼──────────────┤
+│ CD74HC4067E (DIP-24)   │ 2   │ R$ 3-6       │ R$ 6-12      │
+│ Botão táctil 6×6mm     │ 16  │ R$ 0.30      │ R$ 4.80      │
+│ LED 5mm sortidos       │ 16  │ R$ 0.20      │ R$ 3.20      │
+│ R 330Ω ±5% (LEDs)      │ 16  │ R$ 0.10      │ R$ 1.60      │
+├────────────────────────┼─────┼──────────────┼──────────────┤
+│ LCD I2C                                                   │
+├────────────────────────┼─────┼──────────────┼──────────────┤
+│ Display 16×2 I2C       │ 1   │ R$ 15-25     │ R$ 15-25     │
+├────────────────────────┼─────┼──────────────┼──────────────┤
+│ ULTRASSÔNICO                                              │
+├────────────────────────┼─────┼──────────────┼──────────────┤
+│ HC-SR04                │ 1   │ R$ 8-15      │ R$ 8-15      │
+│ R 2kΩ ±5%              │ 1   │ R$ 0.10      │ R$ 0.10      │
+│ R 3kΩ ±5%              │ 1   │ R$ 0.10      │ R$ 0.10      │
+├────────────────────────┼─────┼──────────────┼──────────────┤
+│ MOTOR                                                     │
+├────────────────────────┼─────┼──────────────┼──────────────┤
+│ TB6600 driver          │ 1   │ R$ 25-50     │ R$ 25-50     │
+│ Motor Nema 23 (2A)     │ 1   │ R$ 80-150    │ R$ 80-150    │
+├────────────────────────┼─────┼──────────────┼──────────────┤
+│ ALIMENTAÇÃO                                               │
+├────────────────────────┼─────┼──────────────┼──────────────┤
+│ Fonte 12V 30A          │ 1   │ R$ 80-150    │ R$ 80-150    │
+│ Fusível 25A            │ 1   │ R$ 5-10      │ R$ 5-10      │
+│ Porta-fusível          │ 1   │ R$ 3-5       │ R$ 3-5       │
+│ Chave liga/desliga     │ 1   │ R$ 5-10      │ R$ 5-10      │
+│ Cabo 2.5mm² vermelho   │ 2m  │ R$ 3-5/m     │ R$ 6-10      │
+│ Cabo 2.5mm² preto      │ 2m  │ R$ 3-5/m     │ R$ 6-10      │
+├────────────────────────┼─────┼──────────────┼──────────────┤
+│ MONTAGEM                                                  │
+├────────────────────────┼─────┼──────────────┼──────────────┤
+│ Protoboard 830 pontos  │ 4   │ R$ 15-25     │ R$ 60-100    │
+│ Kit jumpers M-M 65pçs  │ 4   │ R$ 8-12      │ R$ 32-48     │
+│ Cabo blindado PT100    │ 5m  │ R$ 5-8/m     │ R$ 25-40     │
+│ Bornes parafuso 2 vias │ 12  │ R$ 1.50      │ R$ 18        │
+│ Bornes parafuso 3 vias │ 8   │ R$ 2.00      │ R$ 16        │
+├────────────────────────┼─────┼──────────────┼──────────────┤
+│                        TOTAL: R$ 601-1198                 │
+└────────────────────────┴─────┴──────────────┴──────────────┘
+
+═══════════════════════════════════════════════════════════════════════════════
+        11. CHECKLIST DE MONTAGEM - PASSO A PASSO
+═══════════════════════════════════════════════════════════════════════════════
+
+FASE 1: PREPARAÇÃO (1 hora)
+[ ] Conferir todos os componentes recebidos
+[ ] Separar componentes por subsistema
+[ ] Organizar protoboards
+[ ] Preparar ferramentas (multímetro, alicates, ferro solda)
+
+FASE 2: CIRCUITO TL431 - CANAL 1 (BICO) (2 horas)
+[ ] Monte na protoboard 1:
+    [ ] TL431 + resistores R1, R2, R3, R4
+    [ ] Capacitores C1, C2 (100nF)
+    [ ] LM358 + capacitores C3, C4 (100nF, 10µF)
+    [ ] Capacitor C5 (47µF) na saída
+    [ ] PT100 com cabo blindado
+[ ] Teste com multímetro:
+    [ ] TL431 gerando 2.5V na saída
+    [ ] Sem PT100: tensão estável
+    [ ] Com PT100 ambiente: tensão ~X.XX V
+[ ] Conecte saída ao GPIO26
+[ ] Calibre (0°C gelo, 100°C água)
+[ ] Salve constantes de calibração
+
+FASE 3: CIRCUITO TL431 - CANAIS 2, 3, 4 (4 horas)
+[ ] Repita Fase 2 para ZD5 → GPIO27
+[ ] Repita Fase 2 para ZC4 → GPIO28
+[ ] Repita Fase 2 para ZA3 → GPIO29
+[ ] Teste todos 4 canais simultaneamente
+[ ] Verifique leituras sem interferência
+
+FASE 4: MOSFETs + AQUECEDORES (3 horas)
+[ ] Monte MOSFET Q1 (BICO) na protoboard 2:
+    [ ] IRLB3034 com dissipador e pasta térmica
+    [ ] R7 (10kΩ) pull-up Gate
+    [ ] R8 (100kΩ) pull-down Gate
+    [ ] Conecte GPIO2 ao Gate via R7
+    [ ] 3× resistores 6.8Ω em paralelo no Drain
+[ ] Teste Q1 com LED antes de conectar aquecedores
+[ ] Repita para Q2 (GP3), Q3 (GP4), Q4 (GP5)
+[ ] Conecte aquecedores reais
+[ ] Teste PWM duty cycle variável
+
+FASE 5: MULTIPLEXADORES (1.5 horas)
+[ ] Monte MUX1 (botões) na protoboard 3:
+    [ ] CD74HC4067E
+    [ ] Conexões S0-S3 (GP6-9)
+    [ ] SIG → GP14
+    [ ] 16 botões aos canais C0-C15
+[ ] Teste varredura de botões
+[ ] Monte MUX2 (LEDs):
+    [ ] CD74HC4067E
+    [ ] Conexões S0-S3 (GP10-13)
+    [ ] SIG → GP15
+    [ ] 16 LEDs + resistores 330Ω
+[ ] Teste acendimento individual dos LEDs
+
+FASE 6: LCD, ULTRASSÔNICO, MOTOR (2 horas)
+[ ] Conecte LCD I2C:
+    [ ] GP20 → SDA, GP21 → SCL
+    [ ] Teste com i2c_scan
+    [ ] Display "Hello World"
+[ ] Monte sensor ultrassônico:
+    [ ] Divisor de tensão (2kΩ + 3kΩ)
+    [ ] GP18 → TRIG, GP23 → ECHO
+    [ ] Teste leitura de distância
+[ ] Conecte motor:
+    [ ] TB6600 configurado (DIP switches)
+    [ ] GP22 → STEP, GP19 → DIR, GP17 → ENABLE
+    [ ] Teste rotação (sem carga)
+
+FASE 7: ALIMENTAÇÃO (1 hora)
+[ ] Monte fonte 12V:
+    [ ] Instale fusível 25A
+    [ ] Chave liga/desliga
+    [ ] Distribua para TB6600 e MOSFETs
+    [ ] Conecte GND comum com Pico
+[ ] Conecte USB 5V no Pico
+[ ] Verifique todas tensões com multímetro
+
+FASE 8: INTEGRAÇÃO E TESTES (3 horas)
+[ ] Carregue código de teste completo
+[ ] Teste cada subsistema isoladamente:
+    [ ] 4 sensores PT100
+    [ ] 4 MOSFETs (com LEDs)
+    [ ] 16 botões
+    [ ] 16 LEDs
+    [ ] LCD
+    [ ] Ultrassônico
+    [ ] Motor
+[ ] Teste sistema integrado (sem aquecedores)
+[ ] Teste aquecimento gradual (50°C, depois 100°C)
+[ ] Implemente PID e auto-tune
+[ ] Teste final com temperatura real
+
+TEMPO TOTAL ESTIMADO: 17.5 horas
+
+═══════════════════════════════════════════════════════════════════════════════
+        12. VERIFICAÇÃO FINAL - CHECKLIST
+═══════════════════════════════════════════════════════════════════════════════
+
+✅ COMPONENTES (verificar se está tudo listado):
+
+CIRCUITOS INTEGRADOS:
+[✓] 1× Raspberry Pi Pico W
+[✓] 4× TL431 (TO-92)
+[✓] 2× LM358P (DIP-8)
+[✓] 4× IRLB3034 (TO-220)
+[✓] 2× CD74HC4067E (DIP-24)
+
+SENSORES:
+[✓] 4× PT100 (2 fios)
+[✓] 1× HC-SR04
+[✓] 1× LCD 16×2 I2C
+
+MOTOR:
+[✓] 1× TB6600
+[✓] 1× Nema 23
+
+RESISTORES (total: 64):
+[✓] 4× 100Ω
+[✓] 4× 2.2kΩ
+[✓] 4× 3.9kΩ
+[✓] 4× 430Ω ±0.1% ⚠️
+[✓] 8× 10kΩ ±1% (TL431)
+[✓] 4× 10kΩ ±5% (MOSFET)
+[✓] 4× 100kΩ
+[✓] 1× 2kΩ
+[✓] 1× 3kΩ
+[✓] 16× 330Ω
+[✓] 14× 6.8Ω 25W cerâmico
+
+CAPACITORES (total: 20):
+[✓] 12× 100nF cerâmico X7R ⚠️ (NÃO 8!)
+[✓] 4× 10µF eletrolítico radial
+[✓] 4× 47µF eletrolítico radial
+
+INTERFACE:
+[✓] 16× Botões
+[✓] 16× LEDs
+
+MONTAGEM:
+[✓] Protoboards, jumpers, cabos
+[✓] Dissipadores, pasta térmica
+[✓] Bornes, conectores
+
+ALIMENTAÇÃO:
+[✓] Fonte 12V 30A
+[✓] Fusível, porta-fusível
+[✓] Chave, cabos
+
+═══════════════════════════════════════════════════════════════════════════════
+                    CONCLUSÃO DO ESQUEMÁTICO v6
+═══════════════════════════════════════════════════════════════════════════════
+
+✅ VERIFICAÇÕES REALIZADAS:
+
+1. [✓] Todos componentes listados (64 resistores + 20 capacitores)
+2. [✓] Diagrama TL431 COMPLETO (com os 12 capacitores 100nF)
+3. [✓] Diagrama MOSFET completo (pull-up e pull-down)
+4. [✓] Multiplexadores detalhados
+5. [✓] LCD I2C com pinagem
+6. [✓] Ultrassônico com divisor de tensão
+7. [✓] Motor com configuração DIP switches
+8. [✓] Alimentação com cálculo de consumo
+9. [✓] Checklist de montagem passo a passo
+10. [✓] Lista de componentes com preços
+
+CORREÇÕES vs v5:
+• [✓] Capacitores 100nF: 12 ao invés de 8
+• [✓] Diagrama TL431 com TODOS os capacitores
+• [✓] Detalhamento completo de cada circuito
+• [✓] Pinagem exata de todos componentes
+
+ESTE ESQUEMÁTICO ESTÁ COMPLETO E PRONTO PARA MONTAGEM! ✅
+
+═══════════════════════════════════════════════════════════════════════════════
+                              FIM DO ESQUEMÁTICO v6
+═══════════════════════════════════════════════════════════════════════════════

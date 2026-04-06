@@ -1,0 +1,10 @@
+(librepcb_component_category 4e90f42b-2358-4699-a800-63ede23291ae
+ (name "motor step")
+ (description "")
+ (keywords "")
+ (author "Giovanni Grosso")
+ (version "0.1")
+ (created 2026-03-31T19:22:51Z)
+ (deprecated false)
+ (parent none)
+)

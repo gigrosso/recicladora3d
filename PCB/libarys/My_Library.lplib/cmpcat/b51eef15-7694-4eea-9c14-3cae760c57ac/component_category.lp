@@ -1,0 +1,10 @@
+(librepcb_component_category b51eef15-7694-4eea-9c14-3cae760c57ac
+ (name "AQUECIMENTO/resfriamento")
+ (description "")
+ (keywords "")
+ (author "Giovanni Grosso")
+ (version "0.1")
+ (created 2026-04-01T14:00:54Z)
+ (deprecated false)
+ (parent none)
+)
