@@ -1,0 +1,10 @@
+(librepcb_component_category 82654f08-911f-40af-b7d8-e6cbf7369af1
+ (name "Regulador")
+ (description "")
+ (keywords "")
+ (author "Giovanni Grosso")
+ (version "0.1")
+ (created 2026-04-06T21:21:36Z)
+ (deprecated false)
+ (parent none)
+)
