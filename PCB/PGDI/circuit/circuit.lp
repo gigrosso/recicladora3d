@@ -365,6 +365,9 @@
   (name "R47") (value "{{RESISTANCE}}")
   (lock_assembly false)
   (attribute "RESISTANCE" (type resistance) (unit kiloohm) (value "2.2"))
+  (device a6a6744d-7d3b-450a-b782-feca43939ca5
+   (variant 6390f580-b85d-4d69-9954-32d18cc59a10)
+  )
   (signal 3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8 (net cc9cfdc5-d52e-4791-820e-df644f78e979))
   (signal ad623f98-9e73-49c3-9404-f7cfa99d17cd (net 3e452ab7-c454-4122-8265-934dfffadfe2))
  )
@@ -408,6 +411,9 @@
   (name "R45") (value "{{RESISTANCE}}")
   (lock_assembly false)
   (attribute "RESISTANCE" (type resistance) (unit kiloohm) (value "10"))
+  (device a6a6744d-7d3b-450a-b782-feca43939ca5
+   (variant 6390f580-b85d-4d69-9954-32d18cc59a10)
+  )
   (signal 3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8 (net 3588e146-23f7-434c-9991-9e0707b013a7))
   (signal ad623f98-9e73-49c3-9404-f7cfa99d17cd (net 748ded47-b564-4f47-b272-d947ef00dbfc))
  )
@@ -541,6 +547,9 @@
   (lock_assembly false)
   (attribute "CAPACITANCE" (type capacitance) (unit microfarad) (value "47"))
   (attribute "VOLTAGE" (type voltage) (unit volt) (value "25"))
+  (device bba908c0-fdc8-4092-8288-a388fe489250
+   (variant 6390f580-b85d-4d69-9954-32d18cc59a10)
+  )
   (signal af3ffca8-0085-4edb-a775-fcb759f63411 (net 7fdba808-9f1b-436b-8dce-43a19349ae98))
   (signal e010ecbb-6210-4da3-9270-ebd58656dbf0 (net 748ded47-b564-4f47-b272-d947ef00dbfc))
  )
@@ -719,6 +728,9 @@
   (name "R43") (value "{{RESISTANCE}}")
   (lock_assembly false)
   (attribute "RESISTANCE" (type resistance) (unit kiloohm) (value "10"))
+  (device a6a6744d-7d3b-450a-b782-feca43939ca5
+   (variant 6390f580-b85d-4d69-9954-32d18cc59a10)
+  )
   (signal 3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8 (net 073161ce-8542-42c9-b4bc-a5da3f265852))
   (signal ad623f98-9e73-49c3-9404-f7cfa99d17cd (net b375c383-926c-40ba-8f58-6bc9739f0377))
  )
@@ -1046,6 +1058,9 @@
   (name "R46") (value "{{RESISTANCE}}")
   (lock_assembly false)
   (attribute "RESISTANCE" (type resistance) (unit ohm) (value "100"))
+  (device a6a6744d-7d3b-450a-b782-feca43939ca5
+   (variant 6390f580-b85d-4d69-9954-32d18cc59a10)
+  )
   (signal 3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8 (net 3e452ab7-c454-4122-8265-934dfffadfe2))
   (signal ad623f98-9e73-49c3-9404-f7cfa99d17cd (net 1659b53b-b7b6-4171-9d3c-14c78ba4520f))
  )
@@ -1120,6 +1135,9 @@
   (name "C10") (value "{{CAPACITANCE}}")
   (lock_assembly false)
   (attribute "CAPACITANCE" (type capacitance) (unit nanofarad) (value "100"))
+  (device d0691a38-acb7-4a41-b889-99d7a2f92b10
+   (variant 6390f580-b85d-4d69-9954-32d18cc59a10)
+  )
   (signal 1c1c7abc-7b40-4f92-b533-f65604644db7 (net 1659b53b-b7b6-4171-9d3c-14c78ba4520f))
   (signal 6d776f4d-2a7c-4128-a98a-dbb1dd861411 (net 7fdba808-9f1b-436b-8dce-43a19349ae98))
  )
@@ -1129,6 +1147,9 @@
   (name "C9") (value "{{CAPACITANCE}}")
   (lock_assembly false)
   (attribute "CAPACITANCE" (type capacitance) (unit nanofarad) (value "100"))
+  (device d0691a38-acb7-4a41-b889-99d7a2f92b10
+   (variant 6390f580-b85d-4d69-9954-32d18cc59a10)
+  )
   (signal 1c1c7abc-7b40-4f92-b533-f65604644db7 (net 3b931a36-e0b2-479e-81ea-d1c4ffb8a545))
   (signal 6d776f4d-2a7c-4128-a98a-dbb1dd861411 (net 7fdba808-9f1b-436b-8dce-43a19349ae98))
  )
@@ -1138,6 +1159,9 @@
   (name "R13") (value "{{RESISTANCE}}")
   (lock_assembly false)
   (attribute "RESISTANCE" (type resistance) (unit ohm) (value "100"))
+  (device a6a6744d-7d3b-450a-b782-feca43939ca5
+   (variant 6390f580-b85d-4d69-9954-32d18cc59a10)
+  )
   (signal 3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8 (net 3e452ab7-c454-4122-8265-934dfffadfe2))
   (signal ad623f98-9e73-49c3-9404-f7cfa99d17cd (net 3b931a36-e0b2-479e-81ea-d1c4ffb8a545))
  )
@@ -1147,6 +1171,9 @@
   (name "R18") (value "{{RESISTANCE}}")
   (lock_assembly false)
   (attribute "RESISTANCE" (type resistance) (unit kiloohm) (value "2.2"))
+  (device a6a6744d-7d3b-450a-b782-feca43939ca5
+   (variant 6390f580-b85d-4d69-9954-32d18cc59a10)
+  )
   (signal 3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8 (net 04013098-775d-4056-bc7d-288ee7966ed0))
   (signal ad623f98-9e73-49c3-9404-f7cfa99d17cd (net 3e452ab7-c454-4122-8265-934dfffadfe2))
  )
@@ -1179,6 +1206,9 @@
   (name "C7") (value "{{CAPACITANCE}}")
   (lock_assembly false)
   (attribute "CAPACITANCE" (type capacitance) (unit nanofarad) (value "100"))
+  (device d0691a38-acb7-4a41-b889-99d7a2f92b10
+   (variant 6390f580-b85d-4d69-9954-32d18cc59a10)
+  )
   (signal 1c1c7abc-7b40-4f92-b533-f65604644db7 (net 3e452ab7-c454-4122-8265-934dfffadfe2))
   (signal 6d776f4d-2a7c-4128-a98a-dbb1dd861411 (net 7fdba808-9f1b-436b-8dce-43a19349ae98))
  )
@@ -1197,6 +1227,9 @@
   (name "R48") (value "{{RESISTANCE}}")
   (lock_assembly false)
   (attribute "RESISTANCE" (type resistance) (unit kiloohm) (value "3.9"))
+  (device a6a6744d-7d3b-450a-b782-feca43939ca5
+   (variant 6390f580-b85d-4d69-9954-32d18cc59a10)
+  )
   (signal 3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8 (net 7fdba808-9f1b-436b-8dce-43a19349ae98))
   (signal ad623f98-9e73-49c3-9404-f7cfa99d17cd (net cc9cfdc5-d52e-4791-820e-df644f78e979))
  )
@@ -1285,6 +1318,9 @@
   (name "R39") (value "{{RESISTANCE}}")
   (lock_assembly false)
   (attribute "RESISTANCE" (type resistance) (unit kiloohm) (value "3.9"))
+  (device a6a6744d-7d3b-450a-b782-feca43939ca5
+   (variant 6390f580-b85d-4d69-9954-32d18cc59a10)
+  )
   (signal 3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8 (net 7fdba808-9f1b-436b-8dce-43a19349ae98))
   (signal ad623f98-9e73-49c3-9404-f7cfa99d17cd (net 04013098-775d-4056-bc7d-288ee7966ed0))
  )
@@ -1395,6 +1431,9 @@
   (lock_assembly false)
   (attribute "RESISTANCE" (type resistance) (unit ohm) (value "430"))
   (attribute "TOLERANCIA" (type string) (unit none) (value "+/-0,1%"))
+  (device 078650d3-483c-4b9e-a848-b14f1aad2edc
+   (variant 6390f580-b85d-4d69-9954-32d18cc59a10)
+  )
   (signal 3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8 (net 1659b53b-b7b6-4171-9d3c-14c78ba4520f))
   (signal ad623f98-9e73-49c3-9404-f7cfa99d17cd (net 6e2dbd5c-1e1d-4490-b01b-734459f70758))
  )
@@ -1689,6 +1728,9 @@
   (name "R42") (value "{{RESISTANCE}}")
   (lock_assembly false)
   (attribute "RESISTANCE" (type resistance) (unit kiloohm) (value "10"))
+  (device a6a6744d-7d3b-450a-b782-feca43939ca5
+   (variant 6390f580-b85d-4d69-9954-32d18cc59a10)
+  )
   (signal 3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8 (net 7fdba808-9f1b-436b-8dce-43a19349ae98))
   (signal ad623f98-9e73-49c3-9404-f7cfa99d17cd (net 073161ce-8542-42c9-b4bc-a5da3f265852))
  )
@@ -1881,6 +1923,9 @@
   (lock_assembly false)
   (attribute "RESISTANCE" (type resistance) (unit ohm) (value "430"))
   (attribute "TOLERANCIA" (type string) (unit none) (value "+/-0,1%"))
+  (device 078650d3-483c-4b9e-a848-b14f1aad2edc
+   (variant 6390f580-b85d-4d69-9954-32d18cc59a10)
+  )
   (signal 3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8 (net 3b931a36-e0b2-479e-81ea-d1c4ffb8a545))
   (signal ad623f98-9e73-49c3-9404-f7cfa99d17cd (net dfa29b89-4f47-45b9-a506-bb7da13e12c5))
  )
@@ -1914,6 +1959,9 @@
   (name "R44") (value "{{RESISTANCE}}")
   (lock_assembly false)
   (attribute "RESISTANCE" (type resistance) (unit kiloohm) (value "10"))
+  (device a6a6744d-7d3b-450a-b782-feca43939ca5
+   (variant 6390f580-b85d-4d69-9954-32d18cc59a10)
+  )
   (signal 3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8 (net 7fdba808-9f1b-436b-8dce-43a19349ae98))
   (signal ad623f98-9e73-49c3-9404-f7cfa99d17cd (net 3588e146-23f7-434c-9991-9e0707b013a7))
  )
@@ -2000,6 +2048,9 @@
   (lock_assembly false)
   (attribute "CAPACITANCE" (type capacitance) (unit microfarad) (value "47"))
   (attribute "VOLTAGE" (type voltage) (unit volt) (value "25"))
+  (device bba908c0-fdc8-4092-8288-a388fe489250
+   (variant 6390f580-b85d-4d69-9954-32d18cc59a10)
+  )
   (signal af3ffca8-0085-4edb-a775-fcb759f63411 (net 7fdba808-9f1b-436b-8dce-43a19349ae98))
   (signal e010ecbb-6210-4da3-9270-ebd58656dbf0 (net b375c383-926c-40ba-8f58-6bc9739f0377))
  )
@@ -2022,6 +2073,9 @@
   (name "C8") (value "{{CAPACITANCE}}")
   (lock_assembly false)
   (attribute "CAPACITANCE" (type capacitance) (unit nanofarad) (value "100"))
+  (device d0691a38-acb7-4a41-b889-99d7a2f92b10
+   (variant 6390f580-b85d-4d69-9954-32d18cc59a10)
+  )
   (signal 1c1c7abc-7b40-4f92-b533-f65604644db7 (net 3e452ab7-c454-4122-8265-934dfffadfe2))
   (signal 6d776f4d-2a7c-4128-a98a-dbb1dd861411 (net 7fdba808-9f1b-436b-8dce-43a19349ae98))
  )
