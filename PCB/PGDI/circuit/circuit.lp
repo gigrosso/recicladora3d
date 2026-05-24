@@ -527,6 +527,9 @@
   (device 58678317-f386-416d-890a-470f59ab3fba
    (variant 6390f580-b85d-4d69-9954-32d18cc59a10)
   )
+  (device a6a6744d-7d3b-450a-b782-feca43939ca5
+   (variant 6390f580-b85d-4d69-9954-32d18cc59a10)
+  )
   (signal 3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8 (net ea6314ab-3964-4e25-aa5f-c80300155b31))
   (signal ad623f98-9e73-49c3-9404-f7cfa99d17cd (net fb5d5e41-2da4-409c-bae5-e9466a6cd4e3))
  )
@@ -562,6 +565,9 @@
   (name "R37") (value "{{RESISTANCE}}")
   (lock_assembly false)
   (attribute "RESISTANCE" (type resistance) (unit kiloohm) (value "100"))
+  (device a6a6744d-7d3b-450a-b782-feca43939ca5
+   (variant 6390f580-b85d-4d69-9954-32d18cc59a10)
+  )
   (signal 3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8 (net b54ec596-4eef-454f-b677-828b93f4b3b2))
   (signal ad623f98-9e73-49c3-9404-f7cfa99d17cd (net e3afc2ac-fe9e-442e-bca9-9189d396d8a4))
  )
@@ -798,6 +804,9 @@
   (name "R36") (value "{{RESISTANCE}}")
   (lock_assembly false)
   (attribute "RESISTANCE" (type resistance) (unit kiloohm) (value "100"))
+  (device a6a6744d-7d3b-450a-b782-feca43939ca5
+   (variant 6390f580-b85d-4d69-9954-32d18cc59a10)
+  )
   (signal 3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8 (net fb5d5e41-2da4-409c-bae5-e9466a6cd4e3))
   (signal ad623f98-9e73-49c3-9404-f7cfa99d17cd (net e3afc2ac-fe9e-442e-bca9-9189d396d8a4))
  )
@@ -838,6 +847,9 @@
   (name "R35") (value "{{RESISTANCE}}")
   (lock_assembly false)
   (attribute "RESISTANCE" (type resistance) (unit kiloohm) (value "3"))
+  (device a6a6744d-7d3b-450a-b782-feca43939ca5
+   (variant 6390f580-b85d-4d69-9954-32d18cc59a10)
+  )
   (signal 3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8 (net fc024a98-50b2-45bd-a374-85ecd187e996))
   (signal ad623f98-9e73-49c3-9404-f7cfa99d17cd (net ae9a1320-2a35-40c4-9d35-76356c1a6b2e))
  )
@@ -1040,6 +1052,9 @@
   (name "R34") (value "{{RESISTANCE}}")
   (lock_assembly false)
   (attribute "RESISTANCE" (type resistance) (unit kiloohm) (value "2"))
+  (device a6a6744d-7d3b-450a-b782-feca43939ca5
+   (variant 6390f580-b85d-4d69-9954-32d18cc59a10)
+  )
   (signal 3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8 (net ae9a1320-2a35-40c4-9d35-76356c1a6b2e))
   (signal ad623f98-9e73-49c3-9404-f7cfa99d17cd (net 2be8ec3c-3612-471f-bd7b-079371795d86))
  )
@@ -1679,6 +1694,9 @@
   (device 58678317-f386-416d-890a-470f59ab3fba
    (variant 6390f580-b85d-4d69-9954-32d18cc59a10)
   )
+  (device a6a6744d-7d3b-450a-b782-feca43939ca5
+   (variant 6390f580-b85d-4d69-9954-32d18cc59a10)
+  )
   (signal 3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8 (net ecd5470c-eb1e-4d1f-afaa-f0e5fb80e532))
   (signal ad623f98-9e73-49c3-9404-f7cfa99d17cd (net 6ff1db02-667d-4474-9468-c3e522b28c9f))
  )
@@ -1698,6 +1716,9 @@
   (lock_assembly false)
   (attribute "RESISTANCE" (type resistance) (unit kiloohm) (value "10"))
   (device 58678317-f386-416d-890a-470f59ab3fba
+   (variant 6390f580-b85d-4d69-9954-32d18cc59a10)
+  )
+  (device a6a6744d-7d3b-450a-b782-feca43939ca5
    (variant 6390f580-b85d-4d69-9954-32d18cc59a10)
   )
   (signal 3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8 (net 33389c2e-5d94-466e-bafc-7cefe385081e))
@@ -1813,6 +1834,9 @@
   (device 58678317-f386-416d-890a-470f59ab3fba
    (variant 6390f580-b85d-4d69-9954-32d18cc59a10)
   )
+  (device a6a6744d-7d3b-450a-b782-feca43939ca5
+   (variant 6390f580-b85d-4d69-9954-32d18cc59a10)
+  )
   (signal 3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8 (net 2182c8e0-53b1-4bc6-8d9a-0d3597b07ec8))
   (signal ad623f98-9e73-49c3-9404-f7cfa99d17cd (net 4ed8da31-e4a1-4afb-91c4-b8352dbc4df0))
  )
@@ -1822,6 +1846,9 @@
   (name "R40") (value "{{RESISTANCE}}")
   (lock_assembly false)
   (attribute "RESISTANCE" (type resistance) (unit kiloohm) (value "100"))
+  (device a6a6744d-7d3b-450a-b782-feca43939ca5
+   (variant 6390f580-b85d-4d69-9954-32d18cc59a10)
+  )
   (signal 3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8 (net 6ff1db02-667d-4474-9468-c3e522b28c9f))
   (signal ad623f98-9e73-49c3-9404-f7cfa99d17cd (net e3afc2ac-fe9e-442e-bca9-9189d396d8a4))
  )
@@ -1910,6 +1937,9 @@
   (name "R38") (value "{{RESISTANCE}}")
   (lock_assembly false)
   (attribute "RESISTANCE" (type resistance) (unit kiloohm) (value "100"))
+  (device a6a6744d-7d3b-450a-b782-feca43939ca5
+   (variant 6390f580-b85d-4d69-9954-32d18cc59a10)
+  )
   (signal 3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8 (net 4ed8da31-e4a1-4afb-91c4-b8352dbc4df0))
   (signal ad623f98-9e73-49c3-9404-f7cfa99d17cd (net e3afc2ac-fe9e-442e-bca9-9189d396d8a4))
  )
