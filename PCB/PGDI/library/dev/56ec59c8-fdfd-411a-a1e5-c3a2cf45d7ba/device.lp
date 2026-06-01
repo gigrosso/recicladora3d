@@ -1,0 +1,12 @@
+(librepcb_device 56ec59c8-fdfd-411a-a1e5-c3a2cf45d7ba
+ (name "borner 8 vias (borner 8 vias)")
+ (description "")
+ (keywords "")
+ (author "Giovanni Grosso")
+ (version "0.1")
+ (created 2026-06-01T18:42:14Z)
+ (deprecated false)
+ (generated_by "")
+ (component 6c049940-9f01-4384-a602-0f6f8cc539db)
+ (package e3bffe36-3a96-4272-b78b-6114a29c6e8e)
+)

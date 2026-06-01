@@ -1,0 +1,13 @@
+(librepcb_device 03d78667-8ded-4fa3-b4c0-c2ae0365a9c2
+ (name "Soldered Wire Connector 1x02 (borner 2 vias)")
+ (description "A 1x2 soldered wire connector.\n\nGenerated with librepcb-parts-generator (generate_connectors.py)")
+ (keywords "connector, 1x2, connector, soldering, generic")
+ (author "Giovanni Grosso")
+ (version "0.1")
+ (created 2026-06-01T18:48:28Z)
+ (deprecated false)
+ (generated_by "")
+ (category d0618c29-0436-42da-a388-fdadf7b23892)
+ (component f62feaaa-19c4-4378-b699-4528637e1107)
+ (package 56aecec6-2331-46b5-8f9f-56ac68a611bd)
+)
