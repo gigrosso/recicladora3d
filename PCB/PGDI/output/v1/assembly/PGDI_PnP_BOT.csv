@@ -1,0 +1,18 @@
+# Pick&Place Position Data File
+#
+# Project Name:        PGDI
+# Project Version:     v1
+# Board Name:          Board 1
+# Generation Software: LibrePCB 2.0.1
+# Generation Date:     2026-05-26T15:46:25
+# Unit:                mm
+# Rotation:            Degrees CCW
+# Board Side:          Bottom
+# Assembly Types:      THT, SMT, THT+SMT, Fiducial, Other
+
+Designator,Value,Device,Package,Position X,Position Y,Rotation,Side,Type
+Q1,PSMN022-30PL,PSMN022-30PL,TO-220AB,89.535,31.75,90.0,Bottom,THT
+Q2,PSMN022-30PL,PSMN022-30PL,TO-220AB,89.535,43.18,90.0,Bottom,THT
+Q3,PSMN022-30PL,PSMN022-30PL,TO-220AB,89.535,54.61,90.0,Bottom,THT
+Q4,PSMN022-30PL,PSMN022-30PL,TO-220AB,89.535,66.04,90.0,Bottom,THT
+U1,Raspberry Pi Pico W (THT),Raspberry Pi Pico W (THT),RASPBERRY_PICO_W_THT,29.845,40.005,270.0,Bottom,THT
