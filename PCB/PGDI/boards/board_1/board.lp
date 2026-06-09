@@ -4809,7 +4809,7 @@
  )
  (hole 873d7e4a-5cba-473a-a26c-42d5423530fd (diameter 3.0)
   (stop_mask auto) (lock false)
-  (vertex (position 97.155 3.81) (angle 0.0))
+  (vertex (position 94.615 5.715) (angle 0.0))
  )
  (hole 96209165-1296-4fed-b2a7-165c9c38265f (diameter 3.0)
   (stop_mask auto) (lock true)
