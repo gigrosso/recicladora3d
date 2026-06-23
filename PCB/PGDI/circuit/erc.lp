@@ -11,10 +11,5 @@
   (component 890a4cbf-5152-4ebc-b678-c8b56439f059)
   (signal 1d893320-f811-4a79-b64e-cc23d749d394)
  )
- (approved forced_net_name_conflict
-  (component 89d6213d-b933-45cd-bf6b-4acf88ee8695)
-  (signal ff161c97-29a5-43aa-a9ae-3ca7a66982ce)
- )
- (approved open_net (net 26e0681c-a5eb-451a-bb09-7258cb4636c6))
  (approved open_net (net 93310d7a-06bc-4845-9c19-fca0aed78b42))
 )
